@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>RAG Registro Civil</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <main class="chat-shell" aria-label="Chat RAG Registro Civil">
+      <section id="messages" class="messages" aria-live="polite">
+        <article class="message assistant">
+          <div class="bubble">
+            Hola. Puedo responder preguntas sobre los términos y condiciones de la Agencia Virtual del Registro Civil de Ecuador.
+          </div>
+        </article>
+      </section>
+
+      <form id="chat-form" class="composer">
+        <textarea
+          id="message-input"
+          aria-label="Escribe tu pregunta"
+          placeholder="Pregunta sobre el documento..."
+          rows="1"
+          required
+        ></textarea>
+        <button id="send-button" type="submit" aria-label="Enviar pregunta">
+          <span>Enviar</span>
+        </button>
+      </form>
+    </main>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>
