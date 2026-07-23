@@ -69,7 +69,11 @@ form.addEventListener("submit", async (event) => {
       body: JSON.stringify({ message, history: history.slice(0, -1) }),
     });
 
-    const payload = await response.json();
+    const contentType = response.headers.get("content-type") || "";
+    const payload = contentType.includes("application/json")
+      ? await response.json()
+      : { detail: await response.text() };
+
     if (!response.ok) {
       throw new Error(payload.detail || "No se pudo responder.");
     }

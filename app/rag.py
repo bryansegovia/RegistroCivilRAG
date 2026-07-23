@@ -33,6 +33,22 @@ def normalize_history(history: list[dict[str, str]] | None) -> list[Any]:
     return messages[-8:]
 
 
+def extract_text_content(content: Any) -> str:
+    if isinstance(content, str):
+        return content
+
+    if isinstance(content, list):
+        text_parts: list[str] = []
+        for block in content:
+            if isinstance(block, str):
+                text_parts.append(block)
+            elif isinstance(block, dict) and isinstance(block.get("text"), str):
+                text_parts.append(block["text"])
+        return "\n".join(part.strip() for part in text_parts if part.strip())
+
+    return str(content)
+
+
 class RagService:
     def __init__(self) -> None:
         settings = get_settings()
@@ -66,7 +82,7 @@ class RagService:
         response = self.llm.invoke(messages)
 
         return {
-            "answer": response.content,
+            "answer": extract_text_content(response.content),
             "sources": [
                 {
                     "source": document.metadata.get("source", "documento"),
