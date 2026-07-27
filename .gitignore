@@ -14,5 +14,6 @@ data/uploads/
 tmp/
 
 *.log
+logs-*.txt
 .DS_Store
 Thumbs.db

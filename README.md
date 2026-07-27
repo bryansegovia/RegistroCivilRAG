@@ -80,6 +80,22 @@ http://127.0.0.1:8000
 
 Si el indice vectorial no existe y `GEMINI_API_KEY` esta configurada, la aplicacion intentara crearlo al iniciar.
 
+## Deploy En Streamlit Cloud
+
+Para desplegar en Streamlit Cloud usa estos valores:
+
+- Main file path: `streamlit_app.py`
+- Python version: `3.12`
+- Secrets:
+
+```toml
+GEMINI_API_KEY = "tu_api_key_aqui"
+GEMINI_CHAT_MODEL = "gemini-3-flash-preview"
+GEMINI_EMBEDDING_MODEL = "gemini-embedding-2"
+```
+
+En TOML, los valores de texto deben ir entre comillas. No incluyas el archivo `.env` en GitHub; Streamlit Cloud usa los secrets anteriores como variables seguras en runtime.
+
 ## Ejemplos De Preguntas
 
 - Quienes pueden solicitar el duplicado de cedula de identidad?
