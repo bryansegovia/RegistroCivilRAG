@@ -4,6 +4,8 @@ Aplicacion web local de Retrieval Augmented Generation (RAG) para consultar el d
 
 El asistente responde preguntas usando el contenido del PDF incluido en el proyecto. Si una pregunta no puede responderse con ese documento, debe indicarlo claramente y no inventar informacion.
 
+Acceso al RAG: https://registrocivilrag-nl7xs22rgihhfv9kmmw2si.streamlit.app/
+
 ## Arquitectura De La Solucion
 
 El flujo implementado es:
