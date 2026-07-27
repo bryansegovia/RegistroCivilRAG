@@ -1,37 +1,41 @@
-# RAG Local Para Términos Del Registro Civil
+# RAG Local Para Terminos Del Registro Civil
 
-Aplicación local de Retrieval Augmented Generation (RAG) para conversar con el documento de términos y condiciones de la Agencia Virtual del Registro Civil de Ecuador.
+Aplicacion web local de Retrieval Augmented Generation (RAG) para consultar el documento de terminos y condiciones de la Agencia Virtual del Registro Civil de Ecuador.
 
-El sistema no guarda conversaciones en base de datos. El historial existe solo en el navegador mientras la página está abierta.
+El asistente responde preguntas usando el contenido del PDF incluido en el proyecto. Si una pregunta no puede responderse con ese documento, debe indicarlo claramente y no inventar informacion.
 
-## Arquitectura
+## Arquitectura De La Solucion
 
-- `scripts/fetch_terms_to_pdf.py` descarga los términos desde `https://encuestas.registrocivil.gob.ec/terminos.html` y genera un PDF textual en `data/source/terminos_registro_civil.pdf`.
-- `app/document_loader.py` lee documentos PDF o CSV y los divide en fragmentos.
-- `app/ingest.py` crea embeddings con Gemini y guarda el índice local en Chroma (`data/vectorstore/`).
-- `app/rag.py` recupera fragmentos relevantes y responde con Gemini usando un prompt estricto para no inventar datos.
-- `app/main.py` expone FastAPI y sirve la interfaz web.
-- `static/` contiene la UI tipo chat.
+El flujo implementado es:
 
-## Tecnologías
+1. `scripts/fetch_terms_to_pdf.py` obtiene el contenido desde `https://encuestas.registrocivil.gob.ec/terminos.html` y genera un PDF textual en `data/source/terminos_registro_civil.pdf`.
+2. `app/document_loader.py` lee documentos PDF o CSV y los convierte en documentos procesables.
+3. `app/ingest.py` divide el contenido en fragmentos, genera embeddings con Gemini y crea un indice vectorial local con Chroma en `data/vectorstore/`.
+4. `app/rag.py` recupera los fragmentos mas relevantes y usa Gemini con un prompt estricto para responder solo con informacion del documento.
+5. `app/main.py` expone la API con FastAPI y sirve la interfaz web.
+6. `static/` contiene una interfaz tipo chat, sin historial persistente ni base de datos.
+
+## Tecnologias Y Herramientas
 
 - Python
 - FastAPI
 - LangChain
 - Gemini API
 - Chroma como vector store local
-- pypdf para PDF
-- pandas para CSV
+- pypdf para leer PDF
+- pandas para leer CSV
 - ReportLab para generar el PDF fuente
+- HTML, CSS y JavaScript para la interfaz web
+- pytest para pruebas automatizadas
 
-Modelos por defecto:
+Modelos configurados por defecto:
 
 - Chat: `gemini-3.5-flash`
 - Embeddings: `gemini-embedding-2`
 
-## Configuración
+## Instrucciones Para Ejecutar El Proyecto
 
-1. Crea y activa el entorno virtual:
+1. Crea y activa un entorno virtual:
 
 ```powershell
 python -m venv .venv
@@ -44,57 +48,78 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-3. Pega tu API key en `.env`:
+3. Configura tu API key de Gemini en el archivo `.env`:
 
 ```env
 GEMINI_API_KEY=tu_api_key_aqui
 ```
 
-También puedes ajustar los modelos en `.env` si tu cuenta no tiene acceso a los modelos por defecto.
-
-## Uso
-
-Regenerar el PDF fuente:
+4. Regenera el PDF fuente si quieres actualizarlo desde la pagina oficial:
 
 ```powershell
 python scripts\fetch_terms_to_pdf.py
 ```
 
-Crear el índice vectorial:
+5. Crea el indice vectorial:
 
 ```powershell
 python -m app.ingest
 ```
 
-Levantar la aplicación:
+6. Levanta la aplicacion:
 
 ```powershell
 uvicorn app.main:app --reload
 ```
 
-Abre `http://127.0.0.1:8000`.
+7. Abre la app en el navegador:
 
-Si el índice no existe y `GEMINI_API_KEY` está configurada, la app lo crea al iniciar.
+```text
+http://127.0.0.1:8000
+```
+
+Si el indice vectorial no existe y `GEMINI_API_KEY` esta configurada, la aplicacion intentara crearlo al iniciar.
 
 ## Ejemplos De Preguntas
 
-- ¿Qué servicios están disponibles?
-- ¿Qué pasa si fallo 3 veces al ingresar?
-- ¿Qué formas de pago acepta el portal?
-- ¿Se puede devolver un servicio pagado?
-- ¿Dónde contacto soporte si tengo problemas con una transacción?
+- Quienes pueden solicitar el duplicado de cedula de identidad?
+- Formas de pago disponibles
+- Indicame los servicios disponibles
+- Que pasa si fallo 3 veces al ingresar?
+- Se puede devolver un servicio pagado?
+- Donde contacto soporte si tengo problemas con una transaccion?
 
-Para preguntas fuera del documento, el asistente debe indicar que no conoce la respuesta con la información disponible y aclarar que solo cuenta con el contenido de los términos y condiciones.
+## Ejemplos De Respuestas Generadas
+
+**Pregunta:** Formas de pago disponibles
+
+**Respuesta esperada:**
+
+De acuerdo con los terminos y condiciones de la Agencia Virtual del Registro Civil, la forma de pago disponible en el Portal Web es mediante tarjetas de credito Visa o Mastercard. La entidad emisora de la tarjeta debe autorizar la solicitud de pago; si no la autoriza, la compra se cancela y se notifica al usuario. Luego de validar el pago, el usuario puede acceder a los servicios electronicos adquiridos y el pedido se actualiza a estado "Pagado".
+
+**Pregunta:** Existen formas que mi cuenta sea bloqueada?
+
+**Respuesta esperada:**
+
+Si. Segun el documento, la cuenta puede bloquearse automaticamente despues de 3 intentos fallidos de ingreso de datos en la pantalla de acceso. La institucion tambien se reserva la posibilidad de bloquear usuarios si identifica mal uso del Portal Web. Ademas, puede cancelar o suspender cuentas si el usuario proporciona informacion falsa, inexacta o incompleta, o si existen indicios de vulneracion de seguridad. Para desbloquear una cuenta bloqueada por intentos fallidos, el usuario debe usar la opcion de restaurar contrasena y responder las preguntas de seguridad definidas.
+
+**Pregunta:** Cual es el horario de visita del hospital universitario?
+
+**Respuesta esperada:**
+
+No lo se con la informacion disponible. Solo cuento con informacion del documento de terminos y condiciones de la Agencia Virtual del Registro Civil de Ecuador.
 
 ## Pruebas
+
+Ejecuta:
 
 ```powershell
 pytest
 ```
 
-Las pruebas no llaman a Gemini. Validan carga de documentos, fragmentación, prompt anti-alucinación y contrato del endpoint `/api/chat` con un servicio simulado.
+Las pruebas no llaman a Gemini. Validan carga de documentos, fragmentacion, prompt anti-alucinacion y contrato del endpoint `/api/chat` con un servicio simulado.
 
-## Estructura
+## Estructura Del Proyecto
 
 ```text
 app/
